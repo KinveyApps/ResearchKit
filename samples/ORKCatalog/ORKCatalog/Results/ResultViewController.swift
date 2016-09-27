@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import UIKit
 import ResearchKit
+import Kinvey
+import KinveyResearchKit
 
 /**
     The purpose of this view controller is to show you the kinds of data
@@ -47,7 +49,26 @@ class ResultViewController: UITableViewController {
     
     // MARK: Properties
 
-    var result: ORKResult?
+    lazy var stepResultDataStore = DataStore<StepResult>.collection(.network)
+    lazy var taskResultDataStore = DataStore<TaskResult>.collection(.network)
+
+    var result: ORKResult? {
+        didSet {
+            if let stepResult = result as? ORKStepResult {
+                stepResultDataStore.save(stepResult) { stepResult, error in
+                    if let stepResult = stepResult {
+                        print("\(stepResult)")
+                    }
+                }
+            } else if let taskResult = result as? ORKTaskResult {
+                taskResultDataStore.save(taskResult) { taskResult, error in
+                    if let taskResult = taskResult {
+                        print("\(taskResult)")
+                    }
+                }
+            }
+        }
+    }
 
     var currentResult: ORKResult?
 
