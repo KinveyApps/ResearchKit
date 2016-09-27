@@ -144,7 +144,7 @@ func resultTableViewProviderForResult(_ result: ORKResult?) -> protocol<UITableV
         providerType = CollectionResultTableViewProvider.self
         
     default:
-        fatalError("No ResultTableViewProvider defined for \(result.dynamicType).")
+        fatalError("No ResultTableViewProvider defined for \(type(of: result)).")
     }
     
     // Return a new instance of the specific `ResultTableViewProvider`.
@@ -300,7 +300,7 @@ class ResultTableViewProvider: NSObject, UITableViewDataSource, UITableViewDeleg
         
         return [
             // The class name of the result object.
-            ResultRow(text: "type", detail: result.dynamicType),
+            ResultRow(text: "type", detail: type(of: result)),
 
             /*
                 The identifier of the result, which corresponds to the task,
@@ -542,7 +542,9 @@ class FileResultTableViewProvider: ResultTableViewProvider {
             ResultRow(text: "fileURL", detail: questionResult.fileURL)
         ]
         
-        if let fileURL = questionResult.fileURL, let contentType = questionResult.contentType where contentType.hasPrefix("image/") {
+        if let fileURL = questionResult.fileURL,
+            let contentType = questionResult.contentType, contentType.hasPrefix("image/")
+        {
             
             if let image = UIImage.init(contentsOfFile: fileURL.path!) {
                 return rows + [
@@ -1037,7 +1039,7 @@ class CollectionResultTableViewProvider: ResultTableViewProvider {
         // Show the child results in section 1.
         if section == 1 {
             return rows + collectionResult.results!.map { childResult in
-                let childResultClassName = "\(childResult.dynamicType)"
+                let childResultClassName = "\(type(of: childResult))"
 
                 return ResultRow(text: childResultClassName, detail: childResult.identifier, selectable: true)
             }

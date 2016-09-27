@@ -47,7 +47,19 @@ class ResultViewController: UITableViewController {
     
     // MARK: Properties
 
-    var result: ORKResult?
+    var result: ORKResult? {
+        didSet {
+            if let stepResult = result as? ORKStepResult {
+                stepResultDataStore.save(stepResult) { stepResult, error in
+                    print("\(stepResult)")
+                }
+            } else if let taskResult = result as? ORKTaskResult {
+                taskResultDataStore.save(taskResult) { taskResult, error in
+                    print("\(taskResult)")
+                }
+            }
+        }
+    }
 
     var currentResult: ORKResult?
 
@@ -88,8 +100,8 @@ class ResultViewController: UITableViewController {
             result view controller.
         */
         if let identifier = segue.identifier,
-               segueIdentifier = SegueIdentifier(rawValue: identifier)
-               where segueIdentifier == .showTaskResult {
+            let segueIdentifier = SegueIdentifier(rawValue: identifier), segueIdentifier == .showTaskResult
+        {
             
             let cell = sender as! UITableViewCell
             

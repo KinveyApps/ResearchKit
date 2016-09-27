@@ -29,6 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import UIKit
+import Kinvey
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -56,6 +57,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: UIApplicationDelegate
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        
+        Kinvey.sharedClient.logNetworkEnabled = true
+        Kinvey.sharedClient.initialize(appKey: "", appSecret: "")
+        
+        if Kinvey.sharedClient.activeUser == nil {
+            User.exists(username: "test") { exists, error in
+                if exists {
+                    User.login(username: "test", password: "test") { user, error in
+                        print("\(user)")
+                    }
+                } else {
+                    User.signup(username: "test", password: "test") { user, error in
+                        print("\(user)")
+                    }
+                }
+            }
+        }
         
         // When a task result has been finished, update the result view controller's task result.
         taskListViewController.taskResultFinishedCompletionHandler = { [unowned self] taskResult in
